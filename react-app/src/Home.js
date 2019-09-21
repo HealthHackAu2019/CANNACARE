@@ -1,7 +1,11 @@
 import React from "react";
 import styled from "styled-components";
+import { connect } from "react-redux";
 
 import Dropzone from "./Dropzone";
+import Verify from "./Verify";
+import Done from "./Done";
+import UploadStep from "./UploadStep";
 
 const Container = styled.div`
   position: absolute;
@@ -31,21 +35,45 @@ const Container = styled.div`
   }
   section.bottom {
     display: flex;
-    padding: 50px 0 0;
+    flex-direction: column;
+    padding: 50px 100px 0;
     justify-content: center;
+    div.uploadStepsContainer {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 50px;
+    }
   }
 `;
 
-const Home = () => (
-  <Container>
-    <section className="top">
-      <h2 className="active">I want to contribute to the database</h2>
-      <h2>I want to explore the database</h2>
-    </section>
-    <section className="bottom">
-      <Dropzone />
-    </section>
-  </Container>
-);
+const uploadSteps = ["Upload", "Verify Redaction", "Done"];
 
-export default Home;
+const Home = ({ stepIndex, files }) => {
+  return (
+    <Container>
+      <section className="top">
+        <h2 className="active">I want to contribute to the database</h2>
+        <h2>I want to explore the database</h2>
+      </section>
+      <section className="bottom">
+        <div className="uploadStepsContainer">
+          {uploadSteps.map((step, index) => (
+            <UploadStep key={step} index={index}>
+              {step}
+            </UploadStep>
+          ))}
+        </div>
+        {stepIndex === 0 && <Dropzone />}
+        {stepIndex === 1 && <Verify />}
+        {stepIndex === 2 && <Done />}
+      </section>
+    </Container>
+  );
+};
+
+const mapStateToProps = state => ({
+  stepIndex: state.stepIndex,
+  files: state.files
+});
+
+export default connect(mapStateToProps)(Home);
