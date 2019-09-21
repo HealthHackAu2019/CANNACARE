@@ -87,7 +87,8 @@ export class ComprehendStack extends cdk.Stack {
 
     //Queue
     const jobResultsQueue = new sqs.Queue(this, 'JobResults', {
-      deadLetterQueue: { queue: dlq, maxReceiveCount: 50 }
+      deadLetterQueue: { queue: dlq, maxReceiveCount: 50 },
+      visibilityTimeout: Duration.seconds(900)
     });
     //Trigger
     //jobCompletionTopic.subscribeQueue(jobResultsQueue);
