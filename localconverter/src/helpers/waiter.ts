@@ -13,7 +13,7 @@ export default class Waiter{
     } catch (e) {
       if (numAttemptsLeft > 0) {
         logger.warn(
-          `Jira call failed, retrying ${numAttemptsLeft} more times...`
+          `Func call failed, retrying ${numAttemptsLeft} more times...`
         );
         await this.delay(waitIntervalIsMs);
         return this.retryCallUntilNotFailed(

@@ -6,6 +6,8 @@ const fs_1 = tslib_1.__importDefault(require("fs"));
 const uuid_1 = tslib_1.__importDefault(require("./uuid"));
 const logger_1 = tslib_1.__importDefault(require("./logger"));
 const waiter_1 = tslib_1.__importDefault(require("./waiter"));
+// This code is horrendous and only written for demo purposes, please don't write code like this :)
+// (Or use AWS services in this way)
 class Textractor {
     constructor() {
         aws_sdk_1.default.config.region = 'us-east-2';
@@ -14,7 +16,8 @@ class Textractor {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const s3Bucket = 'healthhack2019cannacare';
             const file = fs_1.default.readFileSync(localFilePath);
-            const fileName = uuid_1.default();
+            const fileName = uuid_1.default() + '.pdf';
+            const localRawFileName = localFilePath.substring(0, localFilePath.length - 4) + '.txt';
             const s3 = new aws_sdk_1.default.S3();
             let jobId = '';
             const textout = () => {
@@ -23,12 +26,14 @@ class Textractor {
                     DocumentLocation: {
                         S3Object: { Bucket: s3Bucket, Name: fileName },
                     },
-                    FeatureTypes: ['TABLES', 'FORMS'],
+                    FeatureTypes: ['TABLES', 'FORMS']
                 };
-                converter.startDocumentAnalysis(params, (err, data // AWS.Textract.Types.StartDocumentAnalysisResponse,
-                ) => {
-                    logger_1.default.debug(`Textract job started.  Err: ${JSON.stringify(err)} | Data: ${JSON.stringify(data)}`);
-                    jobId = data.JobId ? data.JobId : '';
+                converter.startDocumentAnalysis(params, (err, data) => {
+                    logger_1.default.debug(`Textract job started.  Err: ${JSON.stringify(err)} | Data: ${JSON.stringify(data)} | Params: ${JSON.stringify(params)}`);
+                    jobId = data && data.JobId ? data.JobId : '';
+                    if (jobId && jobId.length > 0) {
+                        this.waitForJobAndWriteResults(localRawFileName, jobId);
+                    }
                 });
             };
             const upload = () => {
@@ -44,12 +49,11 @@ class Textractor {
                 });
             };
             upload();
-            yield waiter_1.default.retryCallUntilNotFailed(() => {
+            waiter_1.default.retryCallUntilNotFailed(() => {
                 if (jobId !== '') {
                     throw new Error('Job still not retrieved...');
                 }
             }, 60, 1000);
-            logger_1.default.debug(`Textract job ${jobId} has started!`);
             // const getFile = (): Buffer => {
             //   logger.debug(`Geting file from S3: ${fileName}`);
             //   s3.getObject(
@@ -66,6 +70,34 @@ class Textractor {
             //     },
             //   );
             // };
+        });
+    }
+    waitForJobAndWriteResults(localRawFileName, jobId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            let resultFileSaved = false;
+            const getresult = (nextToken = '') => {
+                const converter = new aws_sdk_1.default.Textract();
+                const params = {
+                    JobId: jobId,
+                    MaxResults: 1000,
+                    NextToken: nextToken,
+                };
+                converter.getDocumentAnalysis(params, (err, data) => {
+                    logger_1.default.debug(`Textract job retrieved.  Err: ${JSON.stringify(err)} | Data: ${JSON.stringify(data)}`);
+                    if (!err && data) {
+                        // TODO: paging with the next token
+                        fs_1.default.writeFileSync(localRawFileName, JSON.stringify(data));
+                        resultFileSaved = true;
+                    }
+                });
+            };
+            return yield waiter_1.default.retryCallUntilNotFailed(() => {
+                getresult('');
+                if (resultFileSaved !== true) {
+                    throw new Error('Job result still not retrieved...');
+                }
+                return true;
+            }, 60, 1000);
         });
     }
 }
