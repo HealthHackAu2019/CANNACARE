@@ -18,7 +18,9 @@ const Container = styled.div`
 const Select = styled.div`
   position: relative;
   width: 470px;
-  select {
+  padding-bottom: ${props =>
+      props.bottomGutter ? `${props.bottomGutter}px` : "0"}
+    select {
     display: block;
     font-size: 16px;
     font-family: sans-serif;
@@ -59,7 +61,6 @@ const Select = styled.div`
 const FileSelector = styled.div`
   display: flex;
   position: relative;
-  padding-bottom: 37px;
   align-items: center;
 `;
 
@@ -68,10 +69,11 @@ const FileRedactor = styled.div`
   box-sizing: border-box;
   border-radius: 8px;
   div.header {
-    padding: 30px 25px;
+    padding: 30px 25px 30px;
     p,
     h2 {
       margin: 0;
+      padding: 0;
     }
     h2 {
       padding: 14px 0 25px;
@@ -99,6 +101,99 @@ const FileText = styled.div`
   letter-spacing: 0.02em;
   max-height: 500px;
   overflow-y: scroll;
+`;
+
+const Checkbox = styled.section`
+  padding: 20px 0;
+  .si {
+    --color-default: #dee5f2;
+    --color-active: #1ebf68;
+    --rotate-default: 180deg;
+    --rotate-active: 40deg;
+    --border-size-checkmark: 2px;
+    --border-size-box: 1px;
+    --input-size: 20px;
+    --guter: 15px;
+  }
+
+  .si,
+  .si *,
+  .si *::before,
+  .si *::after {
+    box-sizing: border-box;
+  }
+
+  .si {
+    cursor: pointer;
+    position: relative;
+  }
+
+  .si > input[type="checkbox"],
+  .si > input[type="radio"] {
+    -webkit-clip-path: polygon(0 0);
+    clip-path: polygon(0 0);
+  }
+
+  .si .si-label {
+    display: inline-block;
+    padding-left: var(--guter);
+    vertical-align: text-top;
+    font-size: 14px;
+    font-family: Roboto Slab;
+  }
+
+  .si .si-label::before,
+  .si .si-label::after {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .si .si-label::before {
+    content: "";
+    display: block;
+    width: var(--input-size);
+    height: var(--input-size);
+    border: var(--border-size-box) solid var(--color-default);
+    position: absolute;
+    top: -3px;
+    left: 0;
+    -webkit-transform: rotate(0deg) scale(1);
+    transform: rotate(0deg) scale(1);
+  }
+
+  .si .si-label:hover::before {
+    border-color: var(--color-active);
+  }
+
+  .si.si-checkbox .si-label::before {
+    border-radius: var(--border-size-checkmark);
+  }
+
+  .si.si-checkbox .si-label::after {
+    content: "";
+    display: block;
+    width: 8px;
+    height: 18px;
+    border-width: 0 var(--border-size-checkmark) var(--border-size-checkmark) 0;
+    border-style: solid;
+    border-color: transparent var(--color-active) var(--color-active)
+      transparent;
+    position: absolute;
+    top: -3px;
+    left: 0;
+    -webkit-transform: rotate(var(--rotate-default)) scale(0);
+    transform: rotate(var(--rotate-default)) scale(0);
+  }
+
+  .si.si-checkbox > input:checked + .si-label::after {
+    left: 8px;
+    -webkit-transform: rotate(var(--rotate-active)) scale(1);
+    transform: rotate(var(--rotate-active)) scale(1);
+  }
+
+  .si.si-checkbox > input:checked + .si-label::before {
+    -webkit-transform: rotate(var(--rotate-active)) scale(0);
+    transform: rotate(var(--rotate-active)) scale(0);
+  }
 `;
 
 const SelectIndicator = styled.div`
@@ -139,7 +234,7 @@ const Verify = ({ files, setStep }) => {
   return (
     <Container>
       <FileSelector>
-        <Select>
+        <Select bottomGutter={37}>
           <select>
             {files.map(file => (
               <option key={file.name} value={file.name}>
@@ -179,9 +274,26 @@ const Verify = ({ files, setStep }) => {
         <DividerLine />
         <FileText dangerouslySetInnerHTML={{ __html: redactedFileText }} />
       </FileRedactor>
-      <p>
-        I agree to the <span>consent form</span>
-      </p>
+      {/* <p className="input">
+        <input
+          id="defaultCheckbox"
+          type="checkbox"
+          className="si si-checkbox"
+        />{" "}
+        <label class="si si-checkbox" for="defaultCheckbox">
+          <input id="defaultCheckbox" type="checkbox" />
+          <span class="si-label">Default checkbox state</span>
+        </label>
+        
+      </p> */}
+      <Checkbox>
+        <label class="si si-checkbox" for="defaultCheckbox">
+          <input id="defaultCheckbox" type="checkbox" />
+          <span class="si-label">
+            I agree to the <span>consent form</span>
+          </span>
+        </label>
+      </Checkbox>
       <Button width={270} onClick={() => setStep(2)}>
         Yes, they’re all ready to go
       </Button>

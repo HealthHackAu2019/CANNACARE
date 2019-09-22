@@ -7,12 +7,12 @@ import Button from "./Button";
 const Container = styled.div`
   h2,
   p {
-    font-size: 28px;
+    font-size: 24px;
     margin: 0;
     padding: 0;
   }
   p {
-    padding: 40px 0;
+    padding: 30px 0;
   }
   div {
     width: 312px;

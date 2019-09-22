@@ -8,7 +8,7 @@ import UploadCloud from "./svg/UploadCloud";
 import Button from "./Button";
 
 const DropzoneStyled = styled.div`
-  width: 480px;
+  width: 1100px;
   height: 300px;
   border: 1px dashed #71858c;
   border-radius: 8px;
