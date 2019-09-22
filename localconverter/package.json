@@ -1,0 +1,27 @@
+{
+  "name": "cannacare.localconverter",
+  "version": "0.0.1",
+  "description": "Does all the things in a local environment for demo purposes (Except the actual textract and comprehend calls!)",
+  "main": "dist/program.js",
+  "repository": "https://github.com/HealthHackAu2019/CANNACARE",
+  "author": "CANNACARE team!",
+  "license": "MIT",
+  "scripts": {
+    "start": "yarn build & node ./dist/program.js",
+    "build": "tsc -p ."
+  },
+  "dependencies": {
+    "async": "^3.1.0",
+    "aws-sdk": "^2.533.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.6.3",
+    "uuid": "^3.3.3",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/async": "^3.0.1",
+    "@types/node": "^12.7.5",
+    "@types/uuid": "^3.4.5",
+    "@types/winston": "^2.4.4"
+  }
+}
