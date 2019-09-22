@@ -7,15 +7,8 @@ import Home from "./Home";
 import * as serviceWorker from "./serviceWorker";
 
 const initialState = {
-  files: [
-    {
-      name: "aaa.bbb"
-    },
-    {
-      name: "ccc.ddd"
-    }
-  ],
-  stepIndex: 1
+  files: [],
+  stepIndex: 0
 };
 
 function reducer(state = initialState, action) {

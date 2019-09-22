@@ -74,7 +74,7 @@ const DropzoneContent = ({ active, files, onClick }) => {
             onClick(true);
           }}
         >
-          Upload and Redact
+          Upload
         </Button>
       </div>
     );
@@ -82,7 +82,7 @@ const DropzoneContent = ({ active, files, onClick }) => {
   return (
     <div className={`display ${active ? "active" : ""}`}>
       <UploadCloud />
-      <p>Drop Your HERC PDF Here</p>
+      <p>Drop Your APS PDF Here</p>
       <Button>Or choose your file to upload</Button>
     </div>
   );
@@ -117,13 +117,14 @@ const Loading = styled.div`
   }
 `;
 
-const Dropzone = ({ files, addFiles, setStep }) => {
+const Dropzone = ({ setStep }) => {
+  const [files, addFiles] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   useEffect(() => {
     if (isSubmitting === true) {
       window.setTimeout(() => {
-        setStep(1);
-      }, 3000);
+        setStep(3);
+      }, 1000);
     }
   }, [isSubmitting]);
   const onDrop = useCallback(
@@ -153,16 +154,11 @@ const Dropzone = ({ files, addFiles, setStep }) => {
   );
 };
 
-const mapStateToProps = state => ({
-  files: state.files
-});
-
 const mapDispatchToProps = dispatch => ({
-  addFiles: files => dispatch({ type: "ADD_FILES", payload: { files } }),
   setStep: index => dispatch({ type: "SET_STEP", payload: { step: index } })
 });
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps
 )(Dropzone);

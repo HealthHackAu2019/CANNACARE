@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
+import { connect } from "react-redux";
 
 import Button from "./Button";
 
@@ -18,7 +19,10 @@ const Container = styled.div`
   }
 `;
 
-const Done = () => {
+const Done = ({ clearFiles }) => {
+  useEffect(() => {
+    clearFiles();
+  }, []);
   return (
     <Container>
       <h2>Thanks for your valuable information</h2>
@@ -28,4 +32,11 @@ const Done = () => {
   );
 };
 
-export default Done;
+const mapDispatchToProps = dispatch => ({
+  clearFiles: () => dispatch({ type: "CLEAR_FILES" })
+});
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(Done);
