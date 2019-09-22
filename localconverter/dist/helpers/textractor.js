@@ -22,13 +22,13 @@ class Textractor {
             let jobId = '';
             const textout = () => {
                 const converter = new aws_sdk_1.default.Textract();
+                //TODO: Getting error 'Request has invalid parameters' from Textract ??
                 const params = {
                     DocumentLocation: {
                         S3Object: { Bucket: s3Bucket, Name: fileName },
-                    },
-                    FeatureTypes: ['TABLES', 'FORMS']
+                    }
                 };
-                converter.startDocumentAnalysis(params, (err, data) => {
+                converter.startDocumentTextDetection(params, (err, data) => {
                     logger_1.default.debug(`Textract job started.  Err: ${JSON.stringify(err)} | Data: ${JSON.stringify(data)} | Params: ${JSON.stringify(params)}`);
                     jobId = data && data.JobId ? data.JobId : '';
                     if (jobId && jobId.length > 0) {
@@ -82,7 +82,7 @@ class Textractor {
                     MaxResults: 1000,
                     NextToken: nextToken,
                 };
-                converter.getDocumentAnalysis(params, (err, data) => {
+                converter.getDocumentTextDetection(params, (err, data) => {
                     logger_1.default.debug(`Textract job retrieved.  Err: ${JSON.stringify(err)} | Data: ${JSON.stringify(data)}`);
                     if (!err && data) {
                         // TODO: paging with the next token

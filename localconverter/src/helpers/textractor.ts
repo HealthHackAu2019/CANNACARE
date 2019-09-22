@@ -27,15 +27,14 @@ export default class Textractor {
       const converter = new AWS.Textract();
 
       //TODO: Getting error 'Request has invalid parameters' from Textract ??
-      const params: AWS.Textract.StartDocumentAnalysisRequest = {
+      const params: AWS.Textract.StartDocumentTextDetectionRequest = {
         DocumentLocation: {
           S3Object: { Bucket: s3Bucket, Name: fileName },
-        },
-        FeatureTypes: ['TABLES', 'FORMS']
+        }
       };
-      converter.startDocumentAnalysis(params, (
+      converter.startDocumentTextDetection(params, (
         err: AWS.AWSError,
-        data: any, // AWS.Textract.Types.StartDocumentAnalysisResponse,
+        data: AWS.Textract.Types.StartDocumentTextDetectionResponse,
       ) => {
         logger.debug(
           `Textract job started.  Err: ${JSON.stringify(
@@ -107,12 +106,12 @@ export default class Textractor {
     const getresult = (nextToken: string = '') => {
       const converter = new AWS.Textract();
 
-      const params: AWS.Textract.GetDocumentAnalysisRequest = {
+      const params: AWS.Textract.GetDocumentTextDetectionRequest = {
         JobId: jobId,
         MaxResults: 1000,
         NextToken: nextToken,
       };
-      converter.getDocumentAnalysis(params, (
+      converter.getDocumentTextDetection(params, (
         err: AWS.AWSError,
         data: any, // AWS.Textract.Types.StartDocumentAnalysisResponse,
       ) => {
