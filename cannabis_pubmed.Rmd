@@ -1,0 +1,107 @@
+---
+title: "Cannabis"
+author: "Alex Bannach-Brown for CannaCare team @ HealthHack 2019 Brisbane"
+date: "9/21/2019"
+output: 
+  html_document:
+    code_folding: hide
+---
+## Introduction
+
+This is a document which shows the summary information from <a href="https://www.ncbi.nlm.nih.gov/pubmed" target="_blank"> PubMed</a> about cannabis. 
+
+
+```{r setup, include=FALSE}
+## install and load libraries
+# install.packages("rentrez")
+library(rentrez)
+library(plotly)
+
+# set up
+knitr::opts_chunk$set(echo = TRUE)
+chooseCRANmirror(graphics=FALSE, ind=1)
+```
+
+
+
+```{r}
+# cannabis
+cannabis_query <- "((((((((cannabichromene OR cannabichromene OR cannabichromene OR pentyl cannabichromene OR cannabichromene)) OR (cannabinoids OR cannabinoid OR cannabidiol OR cannabinol OR anandamide)) OR (cannabis products OR medical cannabis OR medicinal cannabis)) OR (tetrahydrocannabinol OR tetrahydrocannabivarin OR tetrahydrocannabinolic acid))) AND (Clinical Trial[Publication Type] OR Case Reports[Publication Type] OR Controlled Clinical Trial[Publication Type] OR Observational Study[Publication Type] OR Multicenter Study[Publication Type] OR Randomized Controlled Trial[Publication Type]))) OR (Cannabis OR Medical Marijuana OR CANNABINOIDS[MeSH Terms])"
+cannabis_search <- entrez_search(db = "pubmed", cannabis_query, use_history = TRUE, retmax = 9999)
+cannabis_search$count
+
+#####################################
+### testing retrieval of articles: 
+# cannabis_search$ids
+
+# check lenght of ids is the same 
+# length(res$ids) == res$count
+
+# cannabis_recs <- entrez_fetch(db = "pubmed", id = cannabis_search$ids[1:25], rettype = "xml", parsed = TRUE)
+
+library(XML)
+
+#cannabis <- xpathSApply(cannabis_recs, "//MedlineCitation/Article/ArticleTitle", xmlValue)
+
+#cannabis_sums <- entrez_summary(db = "pubmed", id = cannabis_search$ids[1:25])
+
+
+# title <- extract_from_esummary(cannabis_sums, "title")
+# ###  extract_from_esummary(cannabis_sums, "authors")
+# pubtype <- extract_from_esummary(cannabis_sums, "pubtype")
+# ### source <- extract_from_esummary(cannabis_sums, "source")
+# fulljournalname <- extract_from_esummary(cannabis_sums, "fulljournalname")
+# pubdate <- extract_from_esummary(cannabis_sums, "pubdate")
+# PMID <- extract_from_esummary(cannabis_sums, "uid")
+# URL <- extract_from_esummary(cannabis_sums, "availablefromurl") 
+# ### sortpubdate <- extract_from_esummary(cannabis_sums, "sortpubdate")
+# firstauthor <- extract_from_esummary(cannabis_sums, "sortfirstauthor")  
+
+# # cannabis_records <- as.data.frame(cbind(title, 
+#                           #authors, 
+#                           firstauthor, 
+#                           pubtype, 
+#                           fulljournalname, 
+#                           pubdate, 
+#                           PMID, 
+#                           URL))
+
+
+# cannabis_extr <- extract_from_esummary(cannabis_sums, c("title", "pubtype",  "fulljournalname", "pubdate", "uid", "availablefromurl", "sortfirstauthor"))
+# # knitr::kable(head(t(cannabis_extr)), row.names=FALSE)
+# 
+# entrez_fetch()
+
+```
+
+
+We can visualise the number of cannabis articles published in the past 19 years.
+```{r sys rev human graph}
+sys_rev_year <- function(year, term){
+  query <- paste(term, "AND(", year, "[PDAT])")
+  entrez_search(db="pubmed", term = query, retmax=0)$count
+}
+
+year <- 2000:2019
+papers <- sapply(year, sys_rev_year, term="((((((((cannabichromene OR cannabichromene OR cannabichromene OR pentyl cannabichromene OR cannabichromene)) OR (cannabinoids OR cannabinoid OR cannabidiol OR cannabinol OR anandamide)) OR (cannabis products OR medical cannabis OR medicinal cannabis)) OR (tetrahydrocannabinol OR tetrahydrocannabivarin OR tetrahydrocannabinolic acid))) AND (Clinical Trial[Publication Type] OR Case Reports[Publication Type] OR Controlled Clinical Trial[Publication Type] OR Observational Study[Publication Type] OR Multicenter Study[Publication Type] OR Randomized Controlled Trial[Publication Type]))) OR (Cannabis OR Medical Marijuana OR CANNABINOIDS[MeSH Terms])", USE.NAMES = FALSE)
+## produce the plots
+# plot(year, papers, type='b', main="Increase in Human Systematic Reviews - Count per year 2008:2018", 
+#       ylim =  c(0,17000),
+#       xlab = "Year",
+#       ylab="Articles")
+
+plot_ly( x=~year) %>%
+  add_trace(
+        type = 'scatter', y=~papers, 
+        name = "Number of Medical Articles Published on Cannabis", mode = 'lines+markers',
+        line = list(color = 'rgb(171,39,79)', width = 2)
+          ) %>%
+  layout(
+    title =  "Increase in Medical Articles on Cannabis",
+    xaxis = list(title ="Year"),
+    yaxis = list(title ="Number of Articles", rangemode = "tozero")
+  )
+
+```
+
+
